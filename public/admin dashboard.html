@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="dashboard-container">
+    <h2>Admin Dashboard</h2>
+    <button onclick="logout()">Logout</button>
+
+    <h3>All Users</h3>
+    <div id="userList"></div>
+
+    <h3>All Equipment Listings</h3>
+    <div id="equipmentList"></div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token || localStorage.getItem('role') !== 'admin') {
+      alert('Unauthorized access');
+      window.location.href = 'index.html';
+    }
+
+    async function loadUsers() {
+      const res = await fetch('http://localhost:5000/api/admin/users', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const container = document.getElementById('userList');
+      container.innerHTML = data.map(user => `
+        <div class="equipment-card">
+          <strong>${user.name}</strong> (${user.role})<br>
+          Email: ${user.email} | Contact: ${user.contact || 'N/A'}
+        </div>
+      `).join('');
+    }
+
+    async function loadAllEquipment() {
+      const res = await fetch('http://localhost:5000/api/admin/equipment', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const container = document.getElementById('equipmentList');
+      container.innerHTML = data.map(eq => `
+        <div class="equipment-card">
+          <h4>${eq.name}</h4>
+          <p>${eq.description}</p>
+          <small>Category: ${eq.category} | K${eq.price_per_day}/day</small><br>
+          <small>Uploaded by: ${eq.vendor?.business_name || eq.vendor?.name}</small>
+        </div>
+      `).join('');
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+
+    loadUsers();
+    loadAllEquipment();
+  </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Mining Rental</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="auth-container">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" name="username" placeholder="Full Name" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <input type="text" name="business_name" placeholder="Business Name (optional)" />
+      <input type="text" name="contact" placeholder="Contact Number" />
+      <select name="role" required>
+        <option value="">Select Role</option>
+        <option value="vendor">Vendor</option>
+        <option value="customer">Customer</option>
+      </select>
+      <button type="submit">Register</button>
+      <p>Already have an account? <a href="login.html">Login</a></p>
+    </form>
+  </div>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = new FormData(this);
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.get('username'),
+          email: form.get('email'),
+          password: form.get('password'),
+          business_name: form.get('business_name'),
+          contact: form.get('contact'),
+          role: form.get('role')
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Registration successful. Please login.');
+        window.location.href = 'login.html';
+      } else {
+        alert(data.message);
+      }
+    });
+  </script>
+</body>
+</html>
+
+

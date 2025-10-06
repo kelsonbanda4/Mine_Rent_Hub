@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Equipment Listings</title>
+  <style>
+    body { font-family: Arial; padding: 2rem; background: #f8f8f8; }
+    .equipment-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+    .equipment-card {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      width: 300px;
+    }
+    .equipment-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>My Equipment Listings</h2>
+  <div class="equipment-grid" id="equipmentGrid"></div>
+
+ <script>
+  const vendor = JSON.parse(localStorage.getItem('user'));
+  if (!vendor) {
+    alert("Not logged in.");
+    window.location.href = "index.html";
+  }
+
+  fetch(`/api/vendor/my-equipment/${vendor.id}`)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('equipmentGrid');
+      if (data.length === 0) {
+        container.innerHTML = '<p>No equipment uploaded yet.</p>';
+        return;
+      }
+      data.forEach(eq => {
+        const card = document.createElement('div');
+        card.className = 'equipment-card';
+        card.innerHTML = `
+          <img src="/uploads/${eq.image}" alt="${eq.name}" />
+          <h3>${eq.name}</h3>
+          <p>Type: ${eq.type}</p>
+          <p>Price: K${eq.price} /day</p>
+          <p>${eq.description}</p>
+        `;
+        container.appendChild(card);
+      });
+    });
+</script>
+
+</body>
+</html>
